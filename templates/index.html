@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Movie Recommendation System</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        margin: 50px;
+      }
+
+      h1 {
+        font-size: 24px;
+      }
+
+      #movieForm {
+        margin-top: 20px;
+      }
+
+      #movieName {
+        margin-bottom: 10px;
+      }
+
+      #result {
+        margin-top: 20px;
+        font-weight: bold;
+      }
+    </style>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <h1>Movie Recommendation System</h1>
+    <form id="movieForm">
+      <label for="movieName">Enter your favorite movie name:</label>
+      <input type="text" id="movieName" required />
+      <br />
+      <button type="button" onclick="getRecommendations()">
+        Get Recommendations
+      </button>
+    </form>
+
+    <div id="result"></div>
+
+    <script>
+      function getRecommendations() {
+        var movieName = document.getElementById("movieName").value;
+        fetch("/get_recommendations", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ movieName: movieName }),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            var resultDiv = document.getElementById("result");
+            if (data.error) {
+              resultDiv.innerHTML = "Error: " + data.error;
+            } else {
+              var recommendations = data.recommendations
+                .map((movie) => movie.title)
+                .join("<br>");
+              resultDiv.innerHTML =
+                "Movies suggested for you: <br>" + recommendations;
+            }
+          })
+          .catch((error) => {
+            var resultDiv = document.getElementById("result");
+            resultDiv.innerHTML = "Error: " + error.message;
+          });
+      }
+    </script>
+  </body>
+</html>
